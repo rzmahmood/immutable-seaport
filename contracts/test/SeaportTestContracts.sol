@@ -7,3 +7,4 @@ pragma solidity >=0.8.4;
  *      These are not deployed - they are only used for testing
  */
 import "seaport/contracts/test/TestERC721.sol";
+import "seaport/contracts/test/TestZone.sol";

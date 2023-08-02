@@ -11,16 +11,12 @@ import {
 } from "./encoding";
 
 import type {
-  TestPostExecution,
-  TestZone,
-} from "../../typechain-types";
-import type {
   ConsiderationItem,
   OfferItem,
   OrderComponents,
 } from "./types";
 import type { Contract, Wallet } from "ethers";
-import { ImmutableSeaport } from "../../typechain-types";
+import { ImmutableSeaport, TestZone } from "../../typechain-types";
 import { getBulkOrderTree } from "./eip712/bulk-orders";
 import { ReceivedItemStruct } from "../../typechain-types/contracts/ImmutableSeaport";
 import { CONSIDERATION_EIP712_TYPE, EIP712_DOMAIN, SIGNED_ORDER_EIP712_TYPE, getCurrentTimeStamp } from "./signedZone";
@@ -155,7 +151,6 @@ export async function createOrder (
   offerer: Wallet | Contract,
   zone:
     | TestZone
-    | TestPostExecution
     | Wallet
     | undefined
     | string = undefined,
