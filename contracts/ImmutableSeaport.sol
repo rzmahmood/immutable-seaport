@@ -42,12 +42,14 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
      *                          that may optionally be used to transfer approved
      *                          ERC20/721/1155 tokens.
      */
-    constructor(address conduitController) Consideration(conduitController) Ownable2Step() {}
+    constructor(
+        address conduitController
+    ) Consideration(conduitController) Ownable2Step() {}
 
     /**
      * @dev Set the validity of a zone for use during fulfillment.
      */
-    function setAllowedZone(address zone, bool allowed) external onlyOwner() {
+    function setAllowedZone(address zone, bool allowed) external onlyOwner {
         allowedZones[zone] = allowed;
     }
 
@@ -107,15 +109,14 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
      * @return fulfilled A boolean indicating whether the order has been
      *                   successfully fulfilled.
      */
-    function fulfillBasicOrder(BasicOrderParameters calldata parameters)
-        public
-        payable
-        virtual
-        override
-        returns (bool fulfilled)
-    {
+    function fulfillBasicOrder(
+        BasicOrderParameters calldata parameters
+    ) public payable virtual override returns (bool fulfilled) {
         // All restricted orders are captured using this method
-        if (uint(parameters.basicOrderType) % 4 != 2 && uint(parameters.basicOrderType) % 4 != 3) {
+        if (
+            uint(parameters.basicOrderType) % 4 != 2 &&
+            uint(parameters.basicOrderType) % 4 != 3
+        ) {
             revert OrderNotRestricted();
         }
 
@@ -152,15 +153,14 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
      * @return fulfilled A boolean indicating whether the order has been
      *                   successfully fulfilled.
      */
-    function fulfillBasicOrder_efficient_6GL6yc(BasicOrderParameters calldata parameters)
-        public
-        payable
-        virtual
-        override
-        returns (bool fulfilled)
-    {
+    function fulfillBasicOrder_efficient_6GL6yc(
+        BasicOrderParameters calldata parameters
+    ) public payable virtual override returns (bool fulfilled) {
         // All restricted orders are captured using this method
-        if (uint(parameters.basicOrderType) % 4 != 2 && uint(parameters.basicOrderType) % 4 != 3) {
+        if (
+            uint(parameters.basicOrderType) % 4 != 2 &&
+            uint(parameters.basicOrderType) % 4 != 3
+        ) {
             revert OrderNotRestricted();
         }
 
@@ -198,7 +198,10 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
         Order calldata order,
         bytes32 fulfillerConduitKey
     ) public payable virtual override returns (bool fulfilled) {
-        if (order.parameters.orderType != OrderType.FULL_RESTRICTED && order.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+        if (
+            order.parameters.orderType != OrderType.FULL_RESTRICTED &&
+            order.parameters.orderType != OrderType.PARTIAL_RESTRICTED
+        ) {
             revert OrderNotRestricted();
         }
 
@@ -262,18 +265,22 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
         bytes32 fulfillerConduitKey,
         address recipient
     ) public payable virtual override returns (bool fulfilled) {
-        if (advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED && advancedOrder.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+        if (
+            advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED &&
+            advancedOrder.parameters.orderType != OrderType.PARTIAL_RESTRICTED
+        ) {
             revert OrderNotRestricted();
         }
 
         _rejectIfZoneInvalid(advancedOrder.parameters.zone);
 
-        return super.fulfillAdvancedOrder(
-            advancedOrder,
-            criteriaResolvers,
-            fulfillerConduitKey,
-            recipient
-        );
+        return
+            super.fulfillAdvancedOrder(
+                advancedOrder,
+                criteriaResolvers,
+                fulfillerConduitKey,
+                recipient
+            );
     }
 
     /**
@@ -344,22 +351,35 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
         FulfillmentComponent[][] calldata considerationFulfillments,
         bytes32 fulfillerConduitKey,
         uint256 maximumFulfilled
-    ) public payable virtual override returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    )
+        public
+        payable
+        virtual
+        override
+        returns (
+            bool[] memory,
+            /* availableOrders */ Execution[] memory /* executions */
+        )
+    {
         for (uint256 i = 0; i < orders.length; i++) {
             Order memory order = orders[i];
-            if (order.parameters.orderType != OrderType.FULL_RESTRICTED && order.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+            if (
+                order.parameters.orderType != OrderType.FULL_RESTRICTED &&
+                order.parameters.orderType != OrderType.PARTIAL_RESTRICTED
+            ) {
                 revert OrderNotRestricted();
             }
             _rejectIfZoneInvalid(order.parameters.zone);
         }
 
-        return super.fulfillAvailableOrders(
-            orders,
-            offerFulfillments,
-            considerationFulfillments,
-            fulfillerConduitKey,
-            maximumFulfilled
-        );
+        return
+            super.fulfillAvailableOrders(
+                orders,
+                offerFulfillments,
+                considerationFulfillments,
+                fulfillerConduitKey,
+                maximumFulfilled
+            );
     }
 
     /**
@@ -460,25 +480,40 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
         bytes32 fulfillerConduitKey,
         address recipient,
         uint256 maximumFulfilled
-    ) public payable virtual override returns (bool[] memory, /* availableOrders */ Execution[] memory /* executions */ ) {
+    )
+        public
+        payable
+        virtual
+        override
+        returns (
+            bool[] memory,
+            /* availableOrders */ Execution[] memory /* executions */
+        )
+    {
         for (uint256 i = 0; i < advancedOrders.length; i++) {
             AdvancedOrder memory advancedOrder = advancedOrders[i];
-            if (advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED && advancedOrder.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+            if (
+                advancedOrder.parameters.orderType !=
+                OrderType.FULL_RESTRICTED &&
+                advancedOrder.parameters.orderType !=
+                OrderType.PARTIAL_RESTRICTED
+            ) {
                 revert OrderNotRestricted();
             }
 
             _rejectIfZoneInvalid(advancedOrder.parameters.zone);
         }
 
-        return super.fulfillAvailableAdvancedOrders(
-            advancedOrders,
-            criteriaResolvers,
-            offerFulfillments,
-            considerationFulfillments,
-            fulfillerConduitKey,
-            recipient,
-            maximumFulfilled
-        );
+        return
+            super.fulfillAvailableAdvancedOrders(
+                advancedOrders,
+                criteriaResolvers,
+                offerFulfillments,
+                considerationFulfillments,
+                fulfillerConduitKey,
+                recipient,
+                maximumFulfilled
+            );
     }
 
     /**
@@ -519,10 +554,19 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
          * @custom:name fulfillments
          */
         Fulfillment[] calldata fulfillments
-    ) public payable virtual override returns (Execution[] memory /* executions */ ) {
+    )
+        public
+        payable
+        virtual
+        override
+        returns (Execution[] memory /* executions */)
+    {
         for (uint256 i = 0; i < orders.length; i++) {
             Order memory order = orders[i];
-            if (order.parameters.orderType != OrderType.FULL_RESTRICTED && order.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+            if (
+                order.parameters.orderType != OrderType.FULL_RESTRICTED &&
+                order.parameters.orderType != OrderType.PARTIAL_RESTRICTED
+            ) {
                 revert OrderNotRestricted();
             }
             _rejectIfZoneInvalid(order.parameters.zone);
@@ -597,16 +641,33 @@ contract ImmutableSeaport is Consideration, Ownable2Step {
          */
         Fulfillment[] calldata fulfillments,
         address recipient
-    ) public payable virtual override returns (Execution[] memory /* executions */ ) {
+    )
+        public
+        payable
+        virtual
+        override
+        returns (Execution[] memory /* executions */)
+    {
         for (uint256 i = 0; i < advancedOrders.length; i++) {
             AdvancedOrder memory advancedOrder = advancedOrders[i];
-            if (advancedOrder.parameters.orderType != OrderType.FULL_RESTRICTED && advancedOrder.parameters.orderType != OrderType.PARTIAL_RESTRICTED) {
+            if (
+                advancedOrder.parameters.orderType !=
+                OrderType.FULL_RESTRICTED &&
+                advancedOrder.parameters.orderType !=
+                OrderType.PARTIAL_RESTRICTED
+            ) {
                 revert OrderNotRestricted();
             }
 
             _rejectIfZoneInvalid(advancedOrder.parameters.zone);
         }
 
-        return super.matchAdvancedOrders(advancedOrders, criteriaResolvers, fulfillments, recipient);
+        return
+            super.matchAdvancedOrders(
+                advancedOrders,
+                criteriaResolvers,
+                fulfillments,
+                recipient
+            );
     }
 }
