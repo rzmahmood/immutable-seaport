@@ -1,24 +1,6 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
-const optimizerSettingsNoSpecializer = {
-  enabled: true,
-  runs: 4_294_967_295,
-  details: {
-    peephole: true,
-    inliner: true,
-    jumpdestRemover: true,
-    orderLiterals: true,
-    deduplicate: true,
-    cse: true,
-    constantOptimizer: true,
-    yulDetails: {
-      stackAllocation: true,
-      optimizerSteps:
-        "dhfoDgvulfnTUtnIf[xa[r]EscLMcCTUtTOntnfDIulLculVcul [j]Tpeulxa[rul]xa[r]cLgvifCTUca[r]LSsTOtfDnca[r]Iulc]jmul[jul] VcTOcul jmul",
-    },
-  },
-};
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -27,11 +9,7 @@ const config: HardhatUserConfig = {
         version: "0.8.17",
         settings: {
           viaIR: true,
-          optimizer: {
-            ...(process.env.NO_SPECIALIZER
-              ? optimizerSettingsNoSpecializer
-              : { enabled: true, runs: 0 }),
-          },
+          optimizer:  { enabled: true, runs: 4_294_967_295 },
           metadata: {
             bytecodeHash: "none",
           },
@@ -44,6 +22,16 @@ const config: HardhatUserConfig = {
       },
     ],
     overrides: {
+      "contracts/ImmutableSeaport.sol": {
+        version: "0.8.17",
+        settings: {
+          viaIR: true,
+          optimizer: {
+            enabled: true,
+            runs: 10,
+          },
+        }
+      },
       "contracts/conduit/Conduit.sol": {
         version: "0.8.14",
         settings: {
@@ -74,6 +62,12 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 300000,
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: "USD",
+    outputFile: './gas-reporter-output.json',
+    noColors: true,
   },
   paths: { cache: "hh-cache" },
 };

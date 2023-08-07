@@ -214,8 +214,10 @@ contract ImmutableSignedZone is
             );
         }
 
-        // SIP-6 version byte
-        // bytes1 sip6Version = extraData[0];
+        // Revert if SIP6 version is not accepted (0)
+        if (uint8(extraData[0]) != _ACCEPTED_SIP6_VERSION) {
+            revert UnsupportedExtraDataVersion(uint8(extraData[0]));
+        }
 
         // extraData bytes 1-21: expected fulfiller
         // (zero address means not restricted)
@@ -230,11 +232,6 @@ contract ImmutableSignedZone is
 
         // extraData bytes 93-end: context (optional, variable length)
         bytes calldata context = extraData[93:];
-
-        // Revert if SIP6 version is not accepted (0)
-        if (uint8(extraData[0]) != _ACCEPTED_SIP6_VERSION) {
-            revert UnsupportedExtraDataVersion(uint8(extraData[0]));
-        }
 
         // Revert if expired.
         if (block.timestamp > expiration) {
